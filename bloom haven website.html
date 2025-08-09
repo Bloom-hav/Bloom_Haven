@@ -1,0 +1,151 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bloom Haven - Your trusted nursery and plant home for beautiful plants and gardening services.">
+  <meta name="keywords" content="nursery, plants, gardening, Bloom Haven, plant care">
+  <meta name="author" content="Bloom Haven">
+  <title>Bloom Haven - Nursery & Plant Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 font-sans">
+  <!-- Header -->
+  <header class="bg-green-600 text-white py-4">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Bloom Haven</h1>
+      <nav>
+        <ul class="flex space-x-6">
+          <li><a href="#home" class="hover:underline">Home</a></li>
+          <li><a href="#about" class="hover:underline">About</a></li>
+          <li><a href="#services" class="hover:underline">Services</a></li>
+          <li><a href="#gallery" class="hover:underline">Gallery</a></li>
+          <li><a href="#contact" class="hover:underline">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="bg-cover bg-center h-96 flex items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1506947411487-9d4050d465fc')">
+    <div class="text-center text-white bg-black bg-opacity-50 p-6 rounded">
+      <h2 class="text-4xl font-bold mb-4">Welcome to Bloom Haven</h2>
+      <p class="text-lg">Your one-stop nursery for vibrant plants and expert gardening services.</p>
+      <a href="#contact" class="mt-4 inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Get in Touch</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8">About Bloom Haven</h2>
+      <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+        Bloom Haven is dedicated to bringing nature closer to you. We offer a wide variety of plants, from indoor succulents to outdoor shrubs, along with expert gardening advice and services to help your garden thrive.
+      </p>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="bg-gray-100 py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8">Our Services</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded shadow">
+          <h3 class="text-xl font-semibold mb-4">Plant Sales</h3>
+          <p class="text-gray-600">Explore our diverse collection of indoor and outdoor plants, perfect for any space.</p>
+        </div>
+        <div class="bg-white p-6 rounded shadow">
+          <h3 class="text-xl font-semibold mb-4">Garden Design</h3>
+          <p class="text-gray-600">Transform your space with our custom garden design and landscaping services.</p>
+        </div>
+        <div class="bg-white p-6 rounded shadow">
+          <h3 class="text-xl font-semibold mb-4">Plant Care Advice</h3>
+          <p class="text-gray-600">Get expert tips and consultations to keep your plants healthy and thriving.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8">Gallery</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <img src="https://images.unsplash.com/photo-1515150144380-b090a8f3766f" alt="Plant 1" class="w-full h-64 object-cover rounded">
+        <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6" alt="Plant 2" class="w-full h-64 object-cover rounded">
+        <img src="https://images.unsplash.com/photo-1491147338276-93635d7ba0e5" alt="Plant 3" class="w-full h-64 object-cover rounded">
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="bg-gray-100 py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+      <div class="max-w-lg mx-auto">
+        <div action="#" class="space-y-4">
+          <div>
+            <label for="name" class="block text-gray-700">Name</label>
+            <input type="text" id="name" class="w-full p-2 border rounded" placeholder="Your Name">
+          </div>
+          <div>
+            <label for="email" class="block text-gray-700">Email</label>
+            <input type="email" id="email" class="w-full p-2 border rounded" placeholder="Your Email">
+          </div>
+          <div>
+            <label for="message" class="block text-gray-700">Message</label>
+            <textarea id="message" class="w-full p-2 border rounded" rows="5" placeholder="Your Message"></textarea>
+          </div>
+          <button onclick="alert('Message sent! We will get back to you soon.')" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white py-4">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 Bloom Haven. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
